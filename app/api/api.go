@@ -13,7 +13,14 @@ type api struct{}
 
 // NewInbox handles the creation of a new inbox for the reception of http requests.
 func (api) NewInbox(ctx context.Context, wq *app.ResponseRequest) error {
+	wq.Write([]byte("New Inbox"))
+	return nil
+}
 
+// GetInbox retrieves a giving box using the id it recieves.
+func (api) GetInbox(ctx context.Context, wq *app.ResponseRequest) error {
+	id, _ := wq.Params.Get("id")
+	wq.Write([]byte("Inbox: ID[" + id + "]"))
 	return nil
 }
 
