@@ -1,5 +1,5 @@
 # HttpInbox
-This demos a [WebHookInbox](http://webhookinbox.com/) app built on in go.
+This demos a [WebHookInbox](http://webhookinbox.com/) app built in go.
 
 ## Install
 
