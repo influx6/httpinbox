@@ -27,33 +27,33 @@
 		},
 		{
 			"path": "github.com/influx6/faux/context",
-			"revision": "7188d6518e0d51b5fe7d549c7556042a877a7d42",
-			"revisionTime": "2016-05-22T20:31:10+01:00"
+			"revision": "f17b6661bfbd5413ffd7e59c7e92a58a92198b73",
+			"revisionTime": "2016-05-22T20:53:41+01:00"
 		},
 		{
 			"path": "github.com/influx6/faux/db/mongo",
-			"revision": "7188d6518e0d51b5fe7d549c7556042a877a7d42",
-			"revisionTime": "2016-05-22T20:31:10+01:00"
+			"revision": "f17b6661bfbd5413ffd7e59c7e92a58a92198b73",
+			"revisionTime": "2016-05-22T20:53:41+01:00"
 		},
 		{
 			"path": "github.com/influx6/faux/panics",
-			"revision": "7188d6518e0d51b5fe7d549c7556042a877a7d42",
-			"revisionTime": "2016-05-22T20:31:10+01:00"
+			"revision": "f17b6661bfbd5413ffd7e59c7e92a58a92198b73",
+			"revisionTime": "2016-05-22T20:53:41+01:00"
 		},
 		{
 			"path": "github.com/influx6/faux/sumex",
-			"revision": "7188d6518e0d51b5fe7d549c7556042a877a7d42",
-			"revisionTime": "2016-05-22T20:31:10+01:00"
+			"revision": "f17b6661bfbd5413ffd7e59c7e92a58a92198b73",
+			"revisionTime": "2016-05-22T20:53:41+01:00"
 		},
 		{
 			"path": "github.com/influx6/faux/web/app",
-			"revision": "7188d6518e0d51b5fe7d549c7556042a877a7d42",
-			"revisionTime": "2016-05-22T20:31:10+01:00"
+			"revision": "f17b6661bfbd5413ffd7e59c7e92a58a92198b73",
+			"revisionTime": "2016-05-22T20:53:41+01:00"
 		},
 		{
 			"path": "github.com/influx6/faux/web/middleware",
-			"revision": "7188d6518e0d51b5fe7d549c7556042a877a7d42",
-			"revisionTime": "2016-05-22T20:31:10+01:00"
+			"revision": "f17b6661bfbd5413ffd7e59c7e92a58a92198b73",
+			"revisionTime": "2016-05-22T20:53:41+01:00"
 		},
 		{
 			"origin": "github.com/influx6/faux/vendor/github.com/satori/go.uuid",
