@@ -21,18 +21,18 @@ variables to be set before attempting to run its binary or main file.
   HTTPINBOX_MONGO_HOST
   ```
   Sets the mongo host address which will be used to communicate with the underline
-  mongo database
+  mongo database.
 
   ```
   HTTPINBOX_MONGO_AUTHDB
   ```
   Sets the mongo authentication database name which will be used to authenticate
-  the provided credentails
+  the provided credentials.
 
   ```
   HTTPINBOX_MONGO_DB
   ```
-  Sets the mongo database name which will be used to getting the needed database
+  Sets the mongo database name which will be used to getting the needed database.
 
   ```
   HTTPINBOX_MONGO_USER
@@ -44,6 +44,7 @@ variables to be set before attempting to run its binary or main file.
   ```
   Sets the mongo username password credential for the mongo authentication process.
 
+## Running
 Once all these are set within the host environment or within the deployed container
 the application can be started either by:
 
