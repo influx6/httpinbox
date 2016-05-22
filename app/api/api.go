@@ -16,3 +16,9 @@ func (api) NewInbox(ctx context.Context, wq *app.ResponseRequest) error {
 
 	return nil
 }
+
+// DestroyInbox handles the destruction of inbox with all its contents.
+func (api) DestroyInbox(ctx context.Context, wq *app.ResponseRequest) error {
+
+	return nil
+}

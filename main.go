@@ -6,6 +6,7 @@ import (
 	"os/signal"
 
 	"github.com/ardanlabs/kit/cfg"
+	"github.com/ardanlabs/kit/log"
 	"github.com/influx6/faux/db/mongo"
 	"github.com/influx6/faux/web/app"
 	"github.com/influx6/faux/web/middleware"
@@ -13,6 +14,9 @@ import (
 )
 
 func main() {
+
+	// Initialize the log package.
+	log.Init(os.Stdout, func() int { return log.DEV }, log.Ldefault)
 
 	// Initialize the configuration system to retrieve environment variavles.
 	cfg.Init(cfg.EnvProvider{Namespace: "HTTPINBOX"})
