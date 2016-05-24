@@ -5,45 +5,32 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/log"
-	"github.com/influx6/faux/db/mongo"
-	"github.com/influx6/faux/web/app"
-	"github.com/influx6/faux/web/middleware"
-	"github.com/influx6/httpinbox/app/routes"
+	"github.com/dimfeld/httptreemux"
+	// "github.com/julienschmidt/httprouter"
+	"github.com/influx6/httpinbox/app/api"
 )
 
 func main() {
 
-	// Initialize the log package.
-	log.Init(os.Stdout, func() int { return log.DEV }, log.Ldefault)
+	// Retrieve the environment vairiables needed for the
+	// address and storage path for our inbox.
+	addr := os.Getenv("HTTPINBOX_LISTEN")
+	dataDir := os.Getenv("HTTPINBOX_DATA")
 
-	// Initialize the configuration system to retrieve environment variavles.
-	cfg.Init(cfg.EnvProvider{Namespace: "HTTPINBOX"})
+	if dataDir == "" {
+		panic("Require valid path for inbox store")
+	}
 
-	// Set the base level headers all response must contain.
-	baseHeaders := map[string]string{"X-App": "HttpInbox"}
+	mux := httptreemux.New()
+	inbox := api.New(dataDir)
 
-	// Make a new mongodb session middleware to be used globally.
-	dbm := middleware.MongoDB(mongo.Config{
-		Host:     cfg.MustString("MONGO_HOST"),
-		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
-		DB:       cfg.MustString("MONGO_DB"),
-		User:     cfg.MustString("MONGO_USER"),
-		Password: cfg.MustString("MONGO_PASS"),
-	}, nil)
-
-	// Create the server http.Handler conforming instance.
-	inbox := app.New(nil, true, baseHeaders, middleware.Log, dbm)
-
-	// Register all the routes.
-	routes.InitRoutes(inbox)
-
-	// Retrieve the address we wish to use for the app.
-	addr := cfg.MustString("HOST_ADDR")
+	mux.POST("/inbox", inbox.NewInbox)
+	mux.GET("/inbox/:id", inbox.GetInbox)
+	mux.Handle("", "/inbox/:id", inbox.AddToInbox)
+	// mux.DELETE("/inbox/:id", inbox.GetInbox)
 
 	go func() {
-		http.ListenAndServe(addr, inbox)
+		http.ListenAndServe(addr, mux)
 	}()
 
 	// Listen for an interrupt signal from the OS.
