@@ -144,8 +144,15 @@ func (dm *DataMan) begin() {
 				continue
 			}
 
+			dirfile := fmt.Sprintf("%s/%s", dm.dataDir, wq.ID)
+
+			if err = os.MkdirAll(dirfile, 0777); err != nil {
+				wq.Done <- err
+				continue
+			}
+
 			// Create the needed file within the appropriate path.
-			datafile := fmt.Sprintf("%s/%s/%d", dm.dataDir, wq.ID, wq.rindex)
+			datafile := fmt.Sprintf("%s/%d", dirfile, wq.rindex)
 			file, err := os.Create(datafile)
 			if err != nil {
 				wq.Done <- err

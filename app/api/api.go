@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -45,7 +46,14 @@ func New(dataDir string, views string) *HTTPInbox {
 	if !new {
 		api.mbl.Lock()
 		for _, file := range files {
+			if strings.HasPrefix(file.Name(), ".") {
+				continue
+			}
+
+			fmt.Printf("Adding Inbox: %s\n", file.Name())
+			api.inbox[file.Name()] = 0
 			if fsl, err := api.man.ReadInbox(file.Name()); err == nil {
+				fmt.Printf("Adding Inbox Item: Box[%s] : Items[%d]\n", file.Name(), len(fsl))
 				api.inbox[file.Name()] = len(fsl)
 			}
 		}
@@ -74,7 +82,7 @@ func (h *HTTPInbox) NewInbox(res http.ResponseWriter, req *http.Request, param m
 
 // AddToInbox adds the needed requests into the inbox lists of requests.
 func (h *HTTPInbox) AddToInbox(res http.ResponseWriter, req *http.Request, param map[string]string) {
-	inboxID := param[":id"]
+	inboxID := param["id"]
 
 	var ok bool
 	var count int
@@ -114,6 +122,7 @@ func (h *HTTPInbox) GetAllInbox(res http.ResponseWriter, req *http.Request, para
 	box := make(map[string]int)
 
 	h.mbl.RLock()
+	// fmt.Printf("Allboxes: %+s\n", h.inbox)
 	for id, c := range h.inbox {
 		box[id] = c
 	}
@@ -121,10 +130,12 @@ func (h *HTTPInbox) GetAllInbox(res http.ResponseWriter, req *http.Request, para
 
 	var buf bytes.Buffer
 
-	if err := tm.ExecuteTemplate(&buf, "layout", map[string]interface{}{
-		"total": len(box),
-		"items": box,
-	}); err != nil {
+	data := struct {
+		Total int
+		Items map[string]int
+	}{Total: len(box), Items: box}
+
+	if err := tm.ExecuteTemplate(&buf, "layout", data); err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		res.Write([]byte(err.Error()))
 		return
@@ -136,7 +147,7 @@ func (h *HTTPInbox) GetAllInbox(res http.ResponseWriter, req *http.Request, para
 
 // GetInbox retrieves a giving box using the id it recieves.
 func (h *HTTPInbox) GetInbox(res http.ResponseWriter, req *http.Request, param map[string]string) {
-	inboxID := param[":id"]
+	inboxID := param["id"]
 
 	var ok bool
 	h.mbl.RLock()
@@ -164,10 +175,12 @@ func (h *HTTPInbox) GetInbox(res http.ResponseWriter, req *http.Request, param m
 
 	var buf bytes.Buffer
 
-	if err := tm.ExecuteTemplate(&buf, "layout", map[string]interface{}{
-		"inbox": inboxID,
-		"items": files,
-	}); err != nil {
+	data := struct {
+		Inbox string
+		Items []os.FileInfo
+	}{Inbox: inboxID, Items: files}
+
+	if err := tm.ExecuteTemplate(&buf, "layout", data); err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		res.Write([]byte(err.Error()))
 		return
@@ -179,7 +192,7 @@ func (h *HTTPInbox) GetInbox(res http.ResponseWriter, req *http.Request, param m
 
 // GetInboxItem retrieves a giving box using the id it recieves.
 func (h *HTTPInbox) GetInboxItem(res http.ResponseWriter, req *http.Request, param map[string]string) {
-	inboxID := param[":id"]
+	inboxID := param["id"]
 
 	var ok bool
 	h.mbl.RLock()
@@ -191,7 +204,7 @@ func (h *HTTPInbox) GetInboxItem(res http.ResponseWriter, req *http.Request, par
 		return
 	}
 
-	itemID, err := strconv.Atoi(param[":reqid"])
+	itemID, err := strconv.Atoi(param["reqid"])
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		res.Write([]byte("ItemID must be an int: " + err.Error()))
@@ -214,11 +227,13 @@ func (h *HTTPInbox) GetInboxItem(res http.ResponseWriter, req *http.Request, par
 
 	var buf bytes.Buffer
 
-	if err := tm.ExecuteTemplate(&buf, "layout", map[string]interface{}{
-		"inbox": inboxID,
-		"item":  itemID,
-		"data":  string(data),
-	}); err != nil {
+	mdata := struct {
+		Inbox string
+		Item  int
+		Data  string
+	}{Inbox: inboxID, Item: itemID, Data: string(data)}
+
+	if err := tm.ExecuteTemplate(&buf, "layout", mdata); err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		res.Write([]byte(err.Error()))
 		return

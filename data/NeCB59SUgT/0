@@ -1,0 +1,5 @@
+HEAD /inbox/NeCB59SUgT HTTP/1.1
+Host: localhost:3060
+Accept: */*
+User-Agent: curl/7.43.0
+
