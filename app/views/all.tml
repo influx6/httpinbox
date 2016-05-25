@@ -1,7 +1,7 @@
 {{ define "content" }}
 <section class="inbox">
   <div class="title">
-    <label> {{ .total }} Inbox</label>
+    <label> {{ .Total }} Inbox</label>
   </div>
   <div class="items">
    <ul>

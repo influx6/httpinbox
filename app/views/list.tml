@@ -2,12 +2,12 @@
 <section class="inbox">
 
   <div class="title">
-    <label>{{.inbox}}</label>
+    <label>{{.Inbox}}</label>
   </div>
   <div class="items">
    <ul>
-    {{ range .items }}
-      <li><a href="/inbox/{{..inbox}}/{{ .Name }}">{{ .Name }}</a></li>
+    {{ range .Items }}
+      <li><a href="/inbox/{{..Inbox}}/{{ .Name }}">{{ .Name }}</a></li>
     {{ end}}
     </ul>
   </div>

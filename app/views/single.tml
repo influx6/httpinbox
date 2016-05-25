@@ -1,13 +1,13 @@
 {{ define "content" }}
 <section class="inbox">
   <div class="title">
-    <label>Inbox: <span>{{.inbox}}</span></label>
+    <label>Inbox: <span>{{.Inbox}}</span></label>
   </div>
   <div class="itembox">
-    <label>Request: <span>{{.item}}</span></label>
+    <label>Request: <span>{{.Item}}</span></label>
   </div>
   <div class="item-data">
-  {{data}}
+  {{.Data}}
   </div>
 </section>
 {{ end }}
