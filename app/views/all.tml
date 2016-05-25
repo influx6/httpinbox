@@ -1,0 +1,15 @@
+{{ define "content" }}
+<section class="inbox">
+  <div class="title">
+    <label> {{ .total }} Inbox</label>
+  </div>
+  <div class="items">
+   <ul>
+    {{ range $key, $item := .items }}
+      <li><a href="/inbox/{{$key}}">{{$item}}</a></li>
+    {{ end}}
+    </ul>
+  </div>
+
+</section>
+{{ end }}

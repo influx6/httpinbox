@@ -1,0 +1,16 @@
+{{ define "content" }}
+<section class="inbox">
+
+  <div class="title">
+    <label>{{.inbox}}</label>
+  </div>
+  <div class="items">
+   <ul>
+    {{ range .items }}
+      <li><a href="/inbox/{{..inbox}}/{{ .Name }}">{{ .Name }}</a></li>
+    {{ end}}
+    </ul>
+  </div>
+
+</section>
+{{ end }}
