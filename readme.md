@@ -13,36 +13,22 @@ us to store sensitive details away securely. It requires these environment
 variables to be set before attempting to run its binary or main file.
 
   ```
-  HTTPINBOX_HOST_ADDR
+  HTTPINBOX_LISTEN
   ```
   Sets the address which the application http server will be started with.
 
   ```
-  HTTPINBOX_MONGO_HOST
+  HTTPINBOX_DATA
   ```
-  Sets the mongo host address which will be used to communicate with the underline
-  mongo database.
+  Sets the directory where all the inbox and their data
+  will be stored on disk
 
   ```
-  HTTPINBOX_MONGO_AUTHDB
+  HTTPINBOX_VIEWS
   ```
-  Sets the mongo authentication database name which will be used to authenticate
-  the provided credentials.
+  Sets the directory path where the views/template files
+  are located
 
-  ```
-  HTTPINBOX_MONGO_DB
-  ```
-  Sets the mongo database name which will be used to getting the needed database.
-
-  ```
-  HTTPINBOX_MONGO_USER
-  ```
-  Sets the mongo username credential for the mongo authentication process.
-
-  ```
-  HTTPINBOX_MONGO_PASS
-  ```
-  Sets the mongo username password credential for the mongo authentication process.
 
 ## Running
 Once all these are set within the host environment or within the deployed container
