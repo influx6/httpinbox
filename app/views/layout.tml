@@ -9,11 +9,10 @@
   <body>
   {{ template "content" . }}
   {{ template "footer" .}}
+  </body>
+</html>
 {{ end}}
 
 {{ define "content"}} {{ end}}
 {{ define "header"}} {{ end}}
-{{ define "footer"}}
-  </body>
-</html>
-{{ end }}
+{{ define "footer"}}{{ end }}

@@ -3,11 +3,13 @@
   <div class="title">
     <label>Inbox: <span>{{.Inbox}}</span></label>
   </div>
-  <div class="itembox">
+  <div class="item-box">
     <label>Request: <span>{{.Item}}</span></label>
+    <div class="item-data">
+    <label>Request Data</label></br>
+    {{.Data}}
+    </div>
   </div>
-  <div class="item-data">
-  {{.Data}}
   </div>
 </section>
 {{ end }}
