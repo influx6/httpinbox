@@ -6,7 +6,6 @@ import (
 	"os/signal"
 
 	"github.com/dimfeld/httptreemux"
-	// "github.com/julienschmidt/httprouter"
 	"github.com/influx6/httpinbox/app/api"
 )
 
