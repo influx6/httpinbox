@@ -122,9 +122,7 @@ func (dm *DataMan) ReadInboxItem(inboxID string, rc int) ([]byte, error) {
 // the inbox store.
 func (dm *DataMan) WriteInbox(inboxID string, req *http.Request, rc int) error {
 	wq := NewWriteRequest(inboxID, req, rc)
-
 	dm.newWrites <- wq
-
 	return <-wq.Done
 }
 
@@ -146,7 +144,7 @@ func (dm *DataMan) begin() {
 
 			dirfile := fmt.Sprintf("%s/%s", dm.dataDir, wq.ID)
 
-			if err = os.MkdirAll(dirfile, 0777); err != nil {
+			if err = os.MkdirAll(dirfile, 0755); err != nil {
 				wq.Done <- err
 				continue
 			}

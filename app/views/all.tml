@@ -1,12 +1,12 @@
 {{ define "content" }}
 <section class="inbox">
   <div class="title">
-    <label> {{.Total}} Inbox</label>
+    <label>{{.Total}} Inbox</label>
   </div>
   <div class="items">
    <ul>
     {{range $key, $item := .Items}}
-      <li><a href="/inbox/{{$key}}">{{$item}}</a></li>
+      <li><a href='/inbox/{{$key}}'>{{$item}}</a></li>
     {{end}}
     </ul>
   </div>

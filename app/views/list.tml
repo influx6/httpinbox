@@ -7,7 +7,7 @@
   <div class="items">
    <ul>
     {{ range .Items }}
-      <li><a href="/inbox/{{..Inbox}}/{{ .Name }}">{{ .Name }}</a></li>
+      <li><a href="/inbox/{{ .Name }}">{{ .Name }}</a></li>
     {{ end}}
     </ul>
   </div>

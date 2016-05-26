@@ -39,7 +39,7 @@ func New(dataDir string, views string) *HTTPInbox {
 	var new bool
 	files, err := api.man.ReadAllInbox()
 	if err != nil {
-		os.MkdirAll(dataDir, 0777)
+		os.MkdirAll(dataDir, 0755)
 		new = true
 	}
 
@@ -156,6 +156,7 @@ func (h *HTTPInbox) GetInbox(res http.ResponseWriter, req *http.Request, param m
 
 	if !ok {
 		res.WriteHeader(http.StatusNotFound)
+		res.Write([]byte("InboxID['" + inboxID + "'] not Found."))
 		return
 	}
 
