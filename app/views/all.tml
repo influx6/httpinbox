@@ -6,10 +6,14 @@
   <div class="items">
    <ul>
     {{range $key, $item := .Items}}
-      <li><a href='/inbox/{{$key}}'>{{$item}}</a></li>
+      <li>
+       <a href='/inbox/{{$key}}'>
+          <label class="item_name">{{$key}}</label>
+          <label class="item_size">[Has {{$item}} Items]</label>
+        </a>
+      </li>
     {{end}}
     </ul>
   </div>
-
 </section>
 {{ end }}

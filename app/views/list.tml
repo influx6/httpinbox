@@ -6,11 +6,11 @@
   </div>
   <div class="items">
    <ul>
-    {{ range .Items }}
-      <li><a href="/inbox/{{ .Name }}">{{ .Name }}</a></li>
-    {{ end}}
+    {{ $inbox := .Inbox }}
+    {{ range $k, $v := .Items }}
+      <li><a href="/inbox/{{$inbox}}/{{$v.Name}}">{{$v.Name}}</a></li>
+    {{end}}
     </ul>
   </div>
-
 </section>
 {{ end }}

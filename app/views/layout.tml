@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8">
     <title></title>
-    {{ template "header"}}
+    {{ template "header" . }}
   </head>
   <body>
-  {{ template "content" }}
-  {{ template "footer"}}
+  {{ template "content" . }}
+  {{ template "footer" .}}
 {{ end}}
 
 {{ define "content"}} {{ end}}
