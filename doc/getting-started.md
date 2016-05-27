@@ -25,7 +25,112 @@ our deployment strategy on a longer term.
 ├── main.go
 ├── readme.md
 └── vendor
-    ├── github.com
 ```
 
-We have a `app` directory where the controller code for our application with their view templates are stored and also a `main.go` file which will be used to both run our application and build our binary from when deploying.
+We have a `app` directory where the controller code for our application with their view templates in `app/views` and also a `main.go` file which will be used to both run our application and build our binary for the project when deploying. In accordance with the new go1.6 approach, we also have a `vendor` directory where all source code based dependencies are stored, this allows us to lock down our dependencies with other libraries.
+
+Our application `main.go` file is rather simple, it loads off specific configuration from the environment which allows us to set different configurations depending on the platform be it for `development-testing` or `production` without touching the codebase.
+
+```go
+// main.go
+
+package main
+
+import (
+	"net/http"
+	"os"
+	"os/signal"
+
+	"github.com/dimfeld/httptreemux"
+	"github.com/influx6/httpinbox/app"
+)
+
+func main() {
+
+	// Retrieve the environment vairiables needed for the
+	// address and storage path for our inbox.
+	addr := os.Getenv("HTTPINBOX_LISTEN")
+	dataDir := os.Getenv("HTTPINBOX_DATA")
+	viewsDir := os.Getenv("HTTPINBOX_VIEWS")
+
+	if dataDir == "" {
+		panic("Require valid path for inbox store")
+	}
+
+	if viewsDir == "" {
+		panic("Require valid path for app views")
+	}
+
+	inbox := app.New(dataDir, viewsDir)
+
+	mux := httptreemux.New()
+	mux.GET("/", inbox.GetAllInbox)
+	mux.POST("/inbox", inbox.NewInbox)
+	mux.GET("/inbox/:id", inbox.GetInbox)
+	mux.GET("/inbox/:id/:reqid", inbox.GetInboxItem)
+
+	for _, method := range []string{"POST", "DELETE", "PUT", "PATCH", "HEAD"} {
+		mux.Handle(method, "/inbox/:id", inbox.AddToInbox)
+	}
+
+
+	go func() {
+		http.ListenAndServe(addr, mux)
+	}()
+
+	// Listen for an interrupt signal from the OS.
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+	<-sigChan
+}
+```
+
+Our configurations are loaded from the environment
+using the `os` native package.
+
+```go
+	// Retrieve the environment vairiables needed for the
+	// address and storage path for our inbox.
+	addr := os.Getenv("HTTPINBOX_LISTEN")
+	dataDir := os.Getenv("HTTPINBOX_DATA")
+	viewsDir := os.Getenv("HTTPINBOX_VIEWS")
+
+	if dataDir == "" {
+		panic("Require valid path for inbox store")
+	}
+
+	if viewsDir == "" {
+		panic("Require valid path for app views")
+	}
+```
+
+ I personally believe that the use of panics should be done sparingly and only during the initial, start up phase of an application, because using it during the runtime phase simplify kills your application, loosing a lot of context, data and providing adequate headaches for future runs.
+
+```go
+	mux := httptreemux.New()
+```
+
+ By using the [HttpTreemux](github.com/dimfeld/httptreemux) library which provides a better router than the default `net/http` router, we register for routes which sets up our applications process as a
+ whole.
+
+ - We set up the home("/") which loads up our application's main page where all inboxes are displayed and accessed.
+```go
+	mux.GET("/", inbox.GetAllInbox)
+```
+
+- We set up the route which when it recieves a `POST` requests, generates a inbox with a randomly giving `ID` and redirects to
+the URL for the inbox to which requests could be made to save http
+requests to.
+```go
+	mux.POST("/inbox", inbox.NewInbox)
+```
+
+- We also set up a route which receives requests for inbox with their unique `ID`s.
+```go
+	mux.GET("/inbox/:id", inbox.GetInbox)
+```
+
+- And lastly setup a route through which requests already saved can be used.
+```go
+	mux.GET("/inbox/:id/:reqid", inbox.GetInboxItem)
+```

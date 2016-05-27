@@ -21,6 +21,10 @@ func main() {
 		panic("Require valid path for inbox store")
 	}
 
+	if viewsDir == "" {
+		panic("Require valid path for app views")
+	}
+
 	mux := httptreemux.New()
 	inbox := app.New(dataDir, viewsDir)
 
