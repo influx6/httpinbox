@@ -25,9 +25,9 @@ func main() {
 		panic("Require valid path for app views")
 	}
 
-	mux := httptreemux.New()
 	inbox := app.New(dataDir, viewsDir)
 
+	mux := httptreemux.New()
 	mux.GET("/", inbox.GetAllInbox)
 	mux.POST("/inbox", inbox.NewInbox)
 	mux.GET("/inbox/:id", inbox.GetInbox)
