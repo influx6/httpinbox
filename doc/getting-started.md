@@ -138,7 +138,7 @@ using the `os` native package.
 
 	- HttpInbox  **/app/api.go**
 	The `HttpInbox` implements the logic for handling the different route behaviors
-	we need, our app has 3 basic functions:
+	we need, our app has 4 basic functions:
 
 	1. To create a new inbox when receiving a `POST /inbox`, these lets us
 	generate new inboxes and redirects the client to a new URL `/inbox/:id`, which
@@ -157,6 +157,11 @@ using the `os` native package.
 	IO operation which are needed by our app. This allows us a sweet separation
 	between our controller code and the service part which handles the low-level
 	logic needed by our application.
+
+	4. Display the lists of all inboxes using go templates and render the individual
+	inbox, their requests lists and stored contents of those requests using go templates
+	which are found in the `HTTPINBOX_VIEWS` directory retrieved from the environment
+	variables.
 
 	```go
 package app
@@ -430,7 +435,23 @@ func randString(n int) string {
 
 	```
 
-	- DataWriter
+	- DataMan  **/app/datawriter.go**
+	The `DataMan` encapsulates the IO operations needed by our application, it
+	handles the:
+
+	- Initialization of the folder structure needed for storing the inbox requests
+	- Ensuring the inbox requests are adequately stored within the file system properly
+	- Returning the lists of requests or inbox to the controller.
+
+	One peculiar thing about this approach is that we wish to manage the IO writers,
+	if we had our application having multiple writers then we could at some point
+	face serious issues with the state of requests files where two writers end up
+	writing to the same index for different requests.
+
+	Instead we take the single writer approach which resolves the issue and allows
+	us control for a sequential nature and ensures that we are writing consistently
+	without any unknown gotchas sneaking in. These still allows multiple readers
+	to crawl through the file system without any issues.
 
 ```go
 package app
@@ -447,8 +468,8 @@ import (
 
 //==============================================================================
 
-// WriteRequest defines a requests for storing a http.Requests by the
-// data manager.
+// WriteRequest defines a requests issue for the storage of a http.Requests by the
+// datamanager.
 type WriteRequest struct {
 	ID     string
 	rindex int
@@ -655,3 +676,8 @@ func (dm *DataMan) begin() {
 
 //==============================================================================
 ```
+
+Our application is very simple and the approach we use for its initialization allows
+us to easily have it running anywhere by simply ensuring the needed environment
+variables are set in place and running the appropriate binary generated
+with `go build` within the appropriate deployment system.
