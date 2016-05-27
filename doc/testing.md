@@ -1,3 +1,16 @@
+# Setting up Testing
+Ensuring the operating status of our application is most important and these means
+we need to have tests we can run every time a new update is added to our repository
+to ensure the functionality of our application.
+
+To achieve these we need to have at leasts unit tests ready to be runned by our
+deployment scripts either at commits to our repositories or before deployments
+of new updates.
+
+We will be adding basic level controller tests which allows us to validate the
+behaviour of our endpoints and underline structure of our apps  with the code below:
+
+```go
 package app_test
 
 import (
@@ -193,3 +206,15 @@ func testGetInboxItemData(server *httptest.Server, t *testing.T) {
 		t.Logf("\t%s\tShould have successfully received a 200 http status code for %s", success, inboxURL)
 	}
 }
+
+```
+
+These test will allow us to us to ensure functional correctness and with the
+below scripts added to our Harrow deployment system we can ensure these test
+is runned using `go test` everytime we commit to our git repository.
+
+```sh
+
+
+```
+---Pictures demostrating the addition of test script to arrow here----------
