@@ -1,14 +1,13 @@
 {{ define "content" }}
 <section class="inbox">
+  <div class="menu">
+    <h2><a href='/'>Back to MasterList</h2>
+  </div>
   <div class="title">
-    <label>Inbox: <span>{{.Inbox}}</span></label>
+    <h2><a href='/inbox/{{.Inbox}}'>Inbox: <span>{{.Inbox}} </h2>
   </div>
   <div class="item-box">
-    <label>Request: <span>{{.Item}}</span></label>
-    <div class="item-data">
-    <label>Request Data</label></br>
     {{.Data}}
-    </div>
   </div>
   </div>
 </section>

@@ -1,4 +1,4 @@
-package api
+package app
 
 import (
 	"errors"
@@ -76,13 +76,38 @@ func (dm *DataMan) ReadAllInbox() ([]os.FileInfo, error) {
 		return nil, err
 	}
 
+	// Remove any non-directories or unwanted files.
+	count := len(files) - 1
+
+	for ind, info := range files {
+		if info.Name() == ".DS_Store" || !info.IsDir() {
+			files[ind] = files[count]
+			count--
+			continue
+		}
+	}
+
+	files = files[:count+1]
+
 	// Sort in ascending order by name.
 	sort.Sort(ByName(files))
 
 	return files, nil
 }
 
-// ReadInbox gets a inbox and a specific item from that inbox.
+// PrepareInbox prepares the inbox folder for storage and allows us
+// to persist that inbox.
+func (dm *DataMan) PrepareInbox(inboxID string) error {
+	dirfile := fmt.Sprintf("%s/%s/", dm.dataDir, inboxID)
+
+	if err := os.MkdirAll(dirfile, 0755); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ReadInbox gets a inbox and all items from that inbox.
 func (dm *DataMan) ReadInbox(inboxID string) ([]os.FileInfo, error) {
 	datafile := fmt.Sprintf("%s/%s/", dm.dataDir, inboxID)
 	dir, err := os.Open(datafile)
@@ -95,6 +120,19 @@ func (dm *DataMan) ReadInbox(inboxID string) ([]os.FileInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Remove any directories or unwanted files.
+	count := len(files) - 1
+
+	for ind, info := range files {
+		if info.Name() == ".DS_Store" || info.IsDir() {
+			files[ind] = files[count]
+			count--
+			continue
+		}
+	}
+
+	files = files[:count+1]
 
 	// Sort in ascending order by name.
 	sort.Sort(ByName(files))

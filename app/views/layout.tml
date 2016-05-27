@@ -3,12 +3,134 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title></title>
-    {{ template "header" . }}
+    <title>HttpInbox</title>
+    <style>
+      * {
+        margin: 0px;
+        padding: 0px;
+        font-size: 16px;
+        line-height: 1.0;
+        color: rgb(82, 80, 80);
+      }
+
+      html, body {
+        width: 100%;
+        height: 100%;
+        font-size: 100%;
+        background: rgb(230, 226, 223);
+      }
+
+      a, a:visited,a:focus{
+        color: rgba(0,0,0,1);
+      }
+
+      ul, li {
+        list-style-type: none;
+      }
+
+
+      h1{
+        font-size: 36px;
+        font-size: 2.25em;
+      }
+
+      h2{
+        font-size: 28px;
+        font-size: 1.75em;
+      }
+
+      .boxes {
+        padding: 15px;
+        padding-bottom: 30px;
+      }
+
+      .header h1 a {
+        color: rgb(51, 131, 165);
+        font-size: inherit;
+      }
+
+
+      .inbox {
+        width: 100%;
+      }
+
+      .inbox .menu{
+        padding-bottom: 20px;
+      }
+
+      .inbox .title {
+        padding-bottom: 20px;
+      }
+
+      .inbox .title h3 span{
+        color: #B74E5B;
+      }
+
+      .inbox .title::after {
+        clear: right;
+        content: "";
+      }
+
+      .inbox .items {
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .inbox .items ul  {
+        display: block;
+        height:auto;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .inbox .items ul li {
+        float: left;
+        width: 200px;
+        height: 50px;
+        margin: 20px;
+        text-align: center;
+      }
+
+      .inbox .items ul li a {
+        cursor: pointer;
+      }
+
+      .inbox .items ul li a label{
+        display: block;
+        cursor: pointer;
+      }
+
+      .inbox .items ul li a label.item_name{
+        margin: 0 auto;
+        font-weight: bold;
+      }
+
+      .inbox .items ul li a label.item_size{
+        margin: 0 auto;
+        color: #B74E5B;
+      }
+
+      .inbox .item-box{
+        padding: 10px;
+        width: 95%;
+        min-height: 300px;
+        background: #1B1818;
+        color: #fff;
+        white-space: pre-wrap;
+      }
+
+    </style>
   </head>
   <body>
-  {{ template "content" . }}
-  {{ template "footer" .}}
+    <section class="boxes header">
+      <h1><a href="/"> HttpInbox</a></h1>
+    </section>
+    <section class="boxes content">
+      {{ template "content" . }}
+    </section>
+    <section class="boxes footer">
+      {{ template "footer" .}}
+    </section>
   </body>
 </html>
 {{ end}}

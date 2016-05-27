@@ -1,14 +1,16 @@
 {{ define "content" }}
 <section class="inbox">
-
+  <div class="menu">
+    <h1>
+  </div>
   <div class="title">
-    <label>{{.Inbox}}</label>
+    <h3>Inbox: <span>{{.Inbox}}</span></h3>
   </div>
   <div class="items">
    <ul>
     {{ $inbox := .Inbox }}
     {{ range $k, $v := .Items }}
-      <li><a href="/inbox/{{$inbox}}/{{$v.Name}}">{{$v.Name}}</a></li>
+      <li><a href="/inbox/{{$inbox}}/{{$v.Name}}">Request {{$v.Name}}</a></li>
     {{end}}
     </ul>
   </div>

@@ -1,4 +1,4 @@
-package api
+package app
 
 import (
 	"bytes"
@@ -72,6 +72,12 @@ func (h *HTTPInbox) NewInbox(res http.ResponseWriter, req *http.Request, param m
 		uuid = randString(10)
 	}
 	h.mbl.RUnlock()
+
+	if err := h.man.PrepareInbox(uuid); err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write([]byte(err.Error()))
+		return
+	}
 
 	h.mbl.Lock()
 	defer h.mbl.Unlock()

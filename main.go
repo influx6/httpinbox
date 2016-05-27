@@ -6,7 +6,7 @@ import (
 	"os/signal"
 
 	"github.com/dimfeld/httptreemux"
-	"github.com/influx6/httpinbox/app/api"
+	"github.com/influx6/httpinbox/app"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func main() {
 	}
 
 	mux := httptreemux.New()
-	inbox := api.New(dataDir, viewsDir)
+	inbox := app.New(dataDir, viewsDir)
 
 	mux.GET("/", inbox.GetAllInbox)
 	mux.POST("/inbox", inbox.NewInbox)
@@ -33,7 +33,6 @@ func main() {
 	}
 
 	mux.GET("/inbox/:id/:reqid", inbox.GetInboxItem)
-	// mux.DELETE("/inbox/:id", inbox.GetInbox)
 
 	go func() {
 		http.ListenAndServe(addr, mux)
