@@ -128,7 +128,6 @@ func (h *HTTPInbox) GetAllInbox(res http.ResponseWriter, req *http.Request, para
 	box := make(map[string]int)
 
 	h.mbl.RLock()
-	// fmt.Printf("Allboxes: %+s\n", h.inbox)
 	for id, c := range h.inbox {
 		box[id] = c
 	}
@@ -218,16 +217,26 @@ func (h *HTTPInbox) GetInboxItem(res http.ResponseWriter, req *http.Request, par
 		return
 	}
 
-	tm, err := template.ParseFiles(h.views.For("layout.tml"), h.views.For("single.tml"))
+	data, err := h.man.ReadInboxItem(inboxID, itemID)
 	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
+		res.WriteHeader(http.StatusBadRequest)
 		res.Write([]byte(err.Error()))
 		return
 	}
 
-	data, err := h.man.ReadInboxItem(inboxID, itemID)
+	accepts := req.Header.Get("Accepts")
+	if strings.Contains(accepts, "application/data") {
+		res.Header().Set("Content-Type", "application/data")
+		res.WriteHeader(http.StatusOK)
+		res.Write(data)
+		return
+	}
+
+	res.Header().Set("Content-Type", "text/html")
+
+	tm, err := template.ParseFiles(h.views.For("layout.tml"), h.views.For("single.tml"))
 	if err != nil {
-		res.WriteHeader(http.StatusBadRequest)
+		res.WriteHeader(http.StatusInternalServerError)
 		res.Write([]byte(err.Error()))
 		return
 	}

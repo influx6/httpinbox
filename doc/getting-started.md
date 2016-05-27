@@ -151,17 +151,18 @@ using the `os` native package.
 		using the `/inbox/:id/:index` URL.
 
 	3. To allow viewing all inboxes with the `GET /inbox/:id` and their
-	associated requests using go templates by allowing use of
+	associated requests using go templates to render or when recieving a `Accepts` header of `application/data` to deliver the request raw 	data to the response.
 
-	Underneath `HttpInbox` has a instance of the `DataMan` which encapsulates the
-	IO operation which are needed by our app. This allows us a sweet separation
-	between our controller code and the service part which handles the low-level
-	logic needed by our application.
 
 	4. Display the lists of all inboxes using go templates and render the individual
 	inbox, their requests lists and stored contents of those requests using go templates
 	which are found in the `HTTPINBOX_VIEWS` directory retrieved from the environment
 	variables.
+
+	Underneath `HttpInbox` has a instance of the `DataMan` which encapsulates the
+	IO operation which are needed by our app. This allows us a sweet separation
+	between our controller code and the service part which handles the low-level
+	logic needed by our application.
 
 	```go
 package app
