@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dimfeld/httptreemux"
 	"github.com/influx6/httpinbox/app"
 )
 
@@ -31,18 +30,7 @@ func TestAPI(t *testing.T) {
 			}()
 
 			inbox := app.New("./data", "./views")
-
-			mux := httptreemux.New()
-			mux.GET("/", inbox.GetAllInbox)
-			mux.POST("/inbox", inbox.NewInbox)
-			mux.GET("/inbox/:id", inbox.GetInbox)
-			mux.GET("/inbox/:id/:reqid", inbox.GetInboxItem)
-
-			for _, method := range []string{"POST", "DELETE", "PUT", "PATCH", "HEAD"} {
-				mux.Handle(method, "/inbox/:id", inbox.AddToInbox)
-			}
-
-			serv := httptest.NewServer(mux)
+			serv := httptest.NewServer(inbox)
 			defer serv.Close()
 
 			testIndexRoute(serv, t)
