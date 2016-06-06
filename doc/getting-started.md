@@ -42,7 +42,6 @@ the platform be it for `development-testing` or `production` without touching th
 codebase.
 
 ```go
-// main.go
 
 package main
 
@@ -113,30 +112,30 @@ using the `os` native package.
 	inbox := app.New(dataDir, viewsDir)
 ```
 
-	The core of our small application which instance we created as above is found
-	within the `app` folder which contains the controller code that accepts requests
-	processing them accordingly.
+The core of our small application which instance we created as above is found
+within the `app` folder which contains the controller code that accepts requests
+processing them accordingly.
 
-	It's made up of two structures which encapsulate the intended behaviour and
-	response we need. The first is the `HttpInbox` struct and the second the `DataMan`
-	struct which handles reads and writes requests for IO bound operations.
+It's made up of two structures which encapsulate the intended behaviour and
+response we need. The first is the `HttpInbox` struct and the second the `DataMan`
+struct which handles reads and writes requests for IO bound operations.
 
-	- HttpInbox  **/app/api.go**
-	The `HttpInbox` implements the logic for handling the different route behaviors
-	we need, our app has 4 basic functions:
+- HttpInbox  **/app/api.go**
+ The `HttpInbox` implements the logic for handling the different route behaviors
+we need, our app has 4 basic functions:
 
 	1. To create a new inbox when receiving a `POST /inbox`, these lets us
 	generate new inboxes and redirects the client to a new URL `/inbox/:id`, which
 	requests of non-GET methods could be made to.
 
 	2. To capture all incoming requests using the `NON-GET /inbox/:id`
-		URL(mostly all Non-Get: HEAD, DELETE, POST, PATCH,..etc), and store their
-		internal details in a persistent file within the appropriate directory,
-		catalogue by a increasing index number to allow viewing of a specific requests
-		using the `/inbox/:id/:index` URL.
+	URL(mostly all Non-Get: HEAD, DELETE, POST, PATCH,..etc), and store their
+	internal details in a persistent file within the appropriate directory,
+	catalogue by a increasing index number to allow viewing of a specific requests
+	using the `/inbox/:id/:index` URL.
 
 	3. To allow viewing all inboxes with the `GET /inbox/:id` and their
-	associated requests using go templates to render or when recieving a `Accepts` header of `application/data` to deliver the request raw 	data to the response.
+	associated requests using go templates to render or when recieving a `Accepts` header of `application/data` to deliver the request raw data to the response.
 
 
 	4. Display the lists of all inboxes using go templates and render the individual
@@ -153,7 +152,9 @@ using the `os` native package.
 	simplicity, but its more adviced when dealing with more complex
 	routing needs to use libraries like [GorillaMux](github.com/gorilla/mux).
 
+
 	```go
+	
 package app
 
 import (
