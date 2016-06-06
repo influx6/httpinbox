@@ -265,6 +265,76 @@ func (h *HTTPInbox) DestroyInbox(res http.ResponseWriter, req *http.Request, par
 
 //==============================================================================
 
+const (
+	get  = "get"
+	post = "post"
+)
+
+// ServeHTTP implements the http.Handler interface.
+func (h *HTTPInbox) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	boxLen := len("/inbox")
+
+	if len(r.URL.Path) < boxLen {
+		h.GetAllInbox(w, r, nil)
+		return
+	}
+
+	var paramsPieces []string
+
+	params := r.URL.Path[boxLen:]
+	params = strings.TrimSpace(strings.TrimPrefix(strings.TrimSuffix(params, "/"), "/"))
+
+	if params != "" {
+		paramsPieces = strings.Split(params, "/")
+	}
+
+	switch len(paramsPieces) {
+	case 0:
+		switch strings.ToLower(r.Method) {
+		case get:
+			h.GetAllInbox(w, r, nil)
+			return
+		case post:
+			h.NewInbox(w, r, nil)
+			return
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+	case 1:
+		id := paramsPieces[0]
+
+		switch strings.ToLower(r.Method) {
+		case get:
+			h.GetInbox(w, r, map[string]string{"id": id})
+			return
+		default:
+			h.AddToInbox(w, r, map[string]string{"id": id})
+			return
+		}
+
+	case 2:
+		id := paramsPieces[0]
+		reqid := paramsPieces[1]
+
+		switch strings.ToLower(r.Method) {
+		case get:
+			h.GetInboxItem(w, r, map[string]string{"id": id, "reqid": reqid})
+			return
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+		return
+
+	}
+}
+
+//==============================================================================
+
 // RandString generates a set of random numbers of a set length
 func randString(n int) string {
 	const alphanum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
