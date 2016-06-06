@@ -1,0 +1,7 @@
+POST /inbox/K547X6dHM1 HTTP/1.1
+Host: localhost:3060
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+User-Agent: curl/7.43.0
+
+{}

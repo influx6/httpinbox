@@ -1,12 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 
-	"github.com/dimfeld/httptreemux"
 	"github.com/influx6/httpinbox/app"
+)
+
+const (
+	get  = "get"
+	post = "post"
 )
 
 func main() {
@@ -27,19 +33,72 @@ func main() {
 
 	inbox := app.New(dataDir, viewsDir)
 
-	mux := httptreemux.New()
-	mux.GET("/", inbox.GetAllInbox)
-	mux.POST("/inbox", inbox.NewInbox)
-	mux.GET("/inbox/:id", inbox.GetInbox)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		boxLen := len("/inbox")
 
-	for _, method := range []string{"POST", "DELETE", "PUT", "PATCH", "HEAD"} {
-		mux.Handle(method, "/inbox/:id", inbox.AddToInbox)
-	}
+		if len(r.URL.Path) < boxLen {
+			inbox.GetAllInbox(w, r, nil)
+			return
+		}
 
-	mux.GET("/inbox/:id/:reqid", inbox.GetInboxItem)
+		var paramsPieces []string
+
+		params := r.URL.Path[boxLen:]
+		params = strings.TrimSpace(strings.TrimPrefix(strings.TrimSuffix(params, "/"), "/"))
+
+		if params != "" {
+			paramsPieces = strings.Split(params, "/")
+		}
+
+		switch len(paramsPieces) {
+		case 0:
+			switch strings.ToLower(r.Method) {
+			case get:
+				inbox.GetAllInbox(w, r, nil)
+				return
+			case post:
+				inbox.NewInbox(w, r, nil)
+				return
+			default:
+				w.WriteHeader(http.StatusMethodNotAllowed)
+				return
+			}
+
+		case 1:
+			id := paramsPieces[0]
+
+			switch strings.ToLower(r.Method) {
+			case get:
+				inbox.GetInbox(w, r, map[string]string{"id": id})
+				return
+			default:
+				inbox.AddToInbox(w, r, map[string]string{"id": id})
+				return
+			}
+
+		case 2:
+			id := paramsPieces[0]
+			reqid := paramsPieces[1]
+
+			switch strings.ToLower(r.Method) {
+			case get:
+				inbox.GetInboxItem(w, r, map[string]string{"id": id, "reqid": reqid})
+				return
+			default:
+				w.WriteHeader(http.StatusMethodNotAllowed)
+				return
+			}
+		default:
+			w.WriteHeader(http.StatusBadRequest)
+			return
+
+		}
+	})
 
 	go func() {
-		http.ListenAndServe(addr, mux)
+		if err := http.ListenAndServe(addr, nil); err != nil {
+			fmt.Printf("Server Error: %s\n", err)
+		}
 	}()
 
 	// Listen for an interrupt signal from the OS.
