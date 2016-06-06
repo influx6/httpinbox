@@ -9,11 +9,6 @@ import (
 	"github.com/influx6/httpinbox/app"
 )
 
-const (
-	get  = "get"
-	post = "post"
-)
-
 func main() {
 
 	// Retrieve the environment vairiables needed for the

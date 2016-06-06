@@ -30,16 +30,11 @@ our deployment strategy on a longer term.
 │       ├── list.tml
 │       └── single.tml
 ├── main.go
-├── readme.md
-└── vendor
+└── readme.md
 ```
 
 We have a `app` directory where the controller code for our application with their
-view templates in `app/views` and also a `main.go` file which will be used to both
-run our application and build our binary for the project when deploying.
-In accordance with the new go1.6 approach, we also have a `vendor` directory
-where all source code based dependencies are stored, this allows us to lock down
-our dependencies with other libraries.
+view templates in `app/views` and also a `main.go` file which will be used to both run our application and build our binary for the project when deploying.
 
 Our application `main.go` file is rather simple, it loads off specific configuration
 from the environment which allows us to set different configurations depending on
@@ -56,7 +51,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/dimfeld/httptreemux"
 	"github.com/influx6/httpinbox/app"
 )
 
@@ -78,19 +72,10 @@ func main() {
 
 	inbox := app.New(dataDir, viewsDir)
 
-	mux := httptreemux.New()
-	mux.GET("/", inbox.GetAllInbox)
-	mux.POST("/inbox", inbox.NewInbox)
-	mux.GET("/inbox/:id", inbox.GetInbox)
-	mux.GET("/inbox/:id/:reqid", inbox.GetInboxItem)
-
-	for _, method := range []string{"POST", "DELETE", "PUT", "PATCH", "HEAD"} {
-		mux.Handle(method, "/inbox/:id", inbox.AddToInbox)
-	}
-
-
 	go func() {
-		http.ListenAndServe(addr, mux)
+		if err := http.ListenAndServe(addr, inbox); err != nil {
+			fmt.Printf("Server Error: %s\n", err)
+		}
 	}()
 
 	// Listen for an interrupt signal from the OS.
@@ -134,7 +119,7 @@ using the `os` native package.
 
 	It's made up of two structures which encapsulate the intended behaviour and
 	response we need. The first is the `HttpInbox` struct and the second the `DataMan`
-	struct which handles reads and writes requests for stored inboxes.
+	struct which handles reads and writes requests for IO bound operations.
 
 	- HttpInbox  **/app/api.go**
 	The `HttpInbox` implements the logic for handling the different route behaviors
@@ -163,6 +148,10 @@ using the `os` native package.
 	IO operation which are needed by our app. This allows us a sweet separation
 	between our controller code and the service part which handles the low-level
 	logic needed by our application.
+
+	Although `HttpInbox` implements its own `ServeHTTP` because of its
+	simplicity, but its more adviced when dealing with more complex
+	routing needs to use libraries like [GorillaMux](github.com/gorilla/mux).
 
 	```go
 package app
@@ -295,7 +284,6 @@ func (h *HTTPInbox) GetAllInbox(res http.ResponseWriter, req *http.Request, para
 	box := make(map[string]int)
 
 	h.mbl.RLock()
-	// fmt.Printf("Allboxes: %+s\n", h.inbox)
 	for id, c := range h.inbox {
 		box[id] = c
 	}
@@ -385,16 +373,26 @@ func (h *HTTPInbox) GetInboxItem(res http.ResponseWriter, req *http.Request, par
 		return
 	}
 
-	tm, err := template.ParseFiles(h.views.For("layout.tml"), h.views.For("single.tml"))
+	data, err := h.man.ReadInboxItem(inboxID, itemID)
 	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
+		res.WriteHeader(http.StatusBadRequest)
 		res.Write([]byte(err.Error()))
 		return
 	}
 
-	data, err := h.man.ReadInboxItem(inboxID, itemID)
+	accepts := req.Header.Get("Accepts")
+	if strings.Contains(accepts, "application/data") {
+		res.Header().Set("Content-Type", "application/data")
+		res.WriteHeader(http.StatusOK)
+		res.Write(data)
+		return
+	}
+
+	res.Header().Set("Content-Type", "text/html")
+
+	tm, err := template.ParseFiles(h.views.For("layout.tml"), h.views.For("single.tml"))
 	if err != nil {
-		res.WriteHeader(http.StatusBadRequest)
+		res.WriteHeader(http.StatusInternalServerError)
 		res.Write([]byte(err.Error()))
 		return
 	}
@@ -419,6 +417,76 @@ func (h *HTTPInbox) GetInboxItem(res http.ResponseWriter, req *http.Request, par
 
 // DestroyInbox handles the destruction of inbox with all its contents.
 func (h *HTTPInbox) DestroyInbox(res http.ResponseWriter, req *http.Request, param map[string]string) {
+}
+
+//==============================================================================
+
+const (
+	get  = "get"
+	post = "post"
+)
+
+// ServeHTTP implements the http.Handler interface.
+func (h *HTTPInbox) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	boxLen := len("/inbox")
+
+	if len(r.URL.Path) < boxLen {
+		h.GetAllInbox(w, r, nil)
+		return
+	}
+
+	var paramsPieces []string
+
+	params := r.URL.Path[boxLen:]
+	params = strings.TrimSpace(strings.TrimPrefix(strings.TrimSuffix(params, "/"), "/"))
+
+	if params != "" {
+		paramsPieces = strings.Split(params, "/")
+	}
+
+	switch len(paramsPieces) {
+	case 0:
+		switch strings.ToLower(r.Method) {
+		case get:
+			h.GetAllInbox(w, r, nil)
+			return
+		case post:
+			h.NewInbox(w, r, nil)
+			return
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+	case 1:
+		id := paramsPieces[0]
+
+		switch strings.ToLower(r.Method) {
+		case get:
+			h.GetInbox(w, r, map[string]string{"id": id})
+			return
+		default:
+			h.AddToInbox(w, r, map[string]string{"id": id})
+			return
+		}
+
+	case 2:
+		id := paramsPieces[0]
+		reqid := paramsPieces[1]
+
+		switch strings.ToLower(r.Method) {
+		case get:
+			h.GetInboxItem(w, r, map[string]string{"id": id, "reqid": reqid})
+			return
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+		return
+
+	}
 }
 
 //==============================================================================
